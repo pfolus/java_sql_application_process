@@ -5,39 +5,17 @@ public class SQL {
 
     public static void createTables() {
 
-        String table1 =
-           "CREATE TABLE `mentors` (" +
-           "`id` INTEGER NOT NULL UNIQUE," +
-           "`first_name`	TEXT," +
-           "`last_name`	TEXT," +
-           "`nick_name`	TEXT," +
-           "`phone_number`	INTEGER," +
-           "`email`	TEXT," +
-           "`city`	TEXT," +
-           "`favourite_number`	INTEGER," +
-           "PRIMARY KEY(`id`))";
-
-       String table2 =
-          "CREATE TABLE `applicants` (" +
-          "`id` INTEGER NOT NULL UNIQUE," +
-          "`first_name`	TEXT," +
-          "`last_name`	TEXT," +
-          "`phone_number`	INTEGER," +
-          "`email`	TEXT," +
-          "`application_code`	INTEGER UNIQUE," +
-          "PRIMARY KEY(`id`))";
-
         Connection c = null;
         Statement stmt = null;
 
         try {
            Class.forName("org.sqlite.JDBC");
            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-           System.out.println("Opened database successfully");
+           View.print("Opened database successfully");
 
            stmt = c.createStatement();
-           stmt.executeUpdate(table1);
-           stmt.executeUpdate(table2);
+           stmt.executeUpdate(View.TABLE1);
+           stmt.executeUpdate(View.TABLE2);
            stmt.close();
 
            c.close();
@@ -45,7 +23,7 @@ public class SQL {
            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
            System.exit(0);
         }
-        System.out.println("Table created successfully");
+        View.print("Table created successfully");
     }
 
     public static void insertRecordsIntoTables() {
@@ -58,7 +36,7 @@ public class SQL {
             Class.forName("org.sqlite.JDBC");
             c = DriverManager.getConnection("jdbc:sqlite:test.db");
             c.setAutoCommit(false);
-            System.out.println("Opened database successfully");
+            View.print("Opened database successfully");
 
             stmt = c.createStatement();
             applicants = CSVManager.loadLines("applicants.csv");
@@ -81,7 +59,7 @@ public class SQL {
              System.err.println( e.getClass().getName() + ": " + e.getMessage() );
              System.exit(0);
           }
-          System.out.println("Records created successfully");
+          View.print("Records created successfully");
         }
 
     public static void selectMentorsNames() {
@@ -91,7 +69,7 @@ public class SQL {
            Class.forName("org.sqlite.JDBC");
            c = DriverManager.getConnection("jdbc:sqlite:test.db");
            c.setAutoCommit(false);
-           System.out.println("Opened database successfully");
+           View.print("Opened database successfully");
 
            stmt = c.createStatement();
            ResultSet rs = stmt.executeQuery( "SELECT first_name, last_name FROM mentors;" );
@@ -102,7 +80,7 @@ public class SQL {
 
               View.printSameLine("Name: " + firstName);
               View.printSameLine(" | " + lastName);
-              System.out.println();
+              View.newLine();
            }
            rs.close();
            stmt.close();
@@ -111,7 +89,7 @@ public class SQL {
            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
            System.exit(0);
         }
-        System.out.println("Operation done successfully");
+        View.print("Operation done successfully");
     }
 
     public static void selectMentorsNicknames() {
@@ -121,7 +99,7 @@ public class SQL {
            Class.forName("org.sqlite.JDBC");
            c = DriverManager.getConnection("jdbc:sqlite:test.db");
            c.setAutoCommit(false);
-           System.out.println("Opened database successfully");
+           View.print("Opened database successfully");
 
            stmt = c.createStatement();
            ResultSet rs = stmt.executeQuery( "SELECT nick_name FROM mentors WHERE city = 'Miskolc';");
@@ -130,7 +108,7 @@ public class SQL {
               String nickName = rs.getString("nick_name");
 
               View.printSameLine("nick_name: " + nickName);
-              System.out.println();
+              View.newLine();
            }
            rs.close();
            stmt.close();
@@ -139,7 +117,7 @@ public class SQL {
            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
            System.exit(0);
         }
-        System.out.println("Operation done successfully");
+        View.print("Operation done successfully");
     }
 
     public static void selectFullnameAndPhone(String query) {
@@ -149,7 +127,7 @@ public class SQL {
            Class.forName("org.sqlite.JDBC");
            c = DriverManager.getConnection("jdbc:sqlite:test.db");
            c.setAutoCommit(false);
-           System.out.println("Opened database successfully");
+           View.print("Opened database successfully");
 
            stmt = c.createStatement();
            ResultSet rs = stmt.executeQuery(query);
@@ -159,7 +137,7 @@ public class SQL {
 
               View.printSameLine("full_name: " + fullName);
               View.printSameLine(" | phone_number: " + phoneNumber);
-              System.out.println();
+              View.newLine();
            }
            rs.close();
            stmt.close();
@@ -168,7 +146,7 @@ public class SQL {
            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
            System.exit(0);
         }
-        System.out.println("Operation done successfully");
+        View.print("Operation done successfully");
     }
 
     public static void AddApplicantAndShowHisDetails() {
@@ -177,14 +155,15 @@ public class SQL {
         try {
            Class.forName("org.sqlite.JDBC");
            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-           c.setAutoCommit(true);
-           System.out.println("Opened database successfully");
+           c.setAutoCommit(false);
+           View.print("Opened database successfully");
 
            stmt = c.createStatement();
 
            try {
                String sql = "INSERT INTO `applicants` (first_name,last_name,phone_number,email,application_code)" +
                            "VALUES ('Markus', 'Schaffarzyk', '003620/725-2666', 'djnovus@groovecoverage.com', 54823);";
+               c.commit();
                stmt.executeUpdate(sql);
            } catch (Exception e) {
                View.print("User already in base");
@@ -214,7 +193,7 @@ public class SQL {
            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
            System.exit(0);
         }
-        System.out.println("Operation done successfully");
+        View.print("Operation done successfully");
     }
 
     public static void UpdateAndCheckJemima() {
@@ -224,7 +203,7 @@ public class SQL {
            Class.forName("org.sqlite.JDBC");
            c = DriverManager.getConnection("jdbc:sqlite:test.db");
            c.setAutoCommit(false);
-           System.out.println("Opened database successfully");
+           View.print("Opened database successfully");
 
            stmt = c.createStatement();
            String sql = "UPDATE applicants SET phone_number = '003670/223-7459'" +
@@ -253,7 +232,7 @@ public class SQL {
            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
            System.exit(0);
         }
-        System.out.println("Operation done successfully");
+        View.print("Operation done successfully");
     }
 
     public static void DeleteApplicantsByEmail() {
@@ -263,7 +242,7 @@ public class SQL {
            Class.forName("org.sqlite.JDBC");
            c = DriverManager.getConnection("jdbc:sqlite:test.db");
            c.setAutoCommit(false);
-           System.out.println("Opened database successfully");
+           View.print("Opened database successfully");
 
            stmt = c.createStatement();
            String sql = "DELETE FROM applicants WHERE email LIKE '%@mauriseu.net';";
@@ -276,7 +255,7 @@ public class SQL {
            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
            System.exit(0);
         }
-        System.out.println("Operation done successfully");
+        View.print("Operation done successfully");
     }
 
     public static void main( String args[] ) {
