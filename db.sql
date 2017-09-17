@@ -7,8 +7,7 @@ CREATE TABLE `mentors` (
 	`email`	TEXT,
 	`city`	TEXT,
 	`favourite_number`	INTEGER,
-	PRIMARY KEY(`id`)
-	)
+	PRIMARY KEY(`id`))
 
 CREATE TABLE `applicants` (
 	`id` INTEGER NOT NULL UNIQUE,
@@ -18,4 +17,3 @@ CREATE TABLE `applicants` (
 	`email`	TEXT,
 	`application_code`	INTEGER,
 	PRIMARY KEY(`id`)
-	)
