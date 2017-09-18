@@ -21,6 +21,12 @@ public class View {
         "`application_code`	INTEGER UNIQUE," +
         "PRIMARY KEY(`id`))";
 
+    public static final String SEARCHCAROLQUERY = "SELECT (first_name || ' ' || last_name) AS full_name, "
+                                                + "phone_number FROM applicants WHERE first_name = 'Carol';";
+
+    public static final String EMAILSEARCHQUERY = "SELECT (first_name || ' ' || last_name) AS full_name, "
+                                                + "phone_number FROM applicants WHERE email LIKE '%@adipiscingenimmi.edu';";
+
     public static void print(String text){
         System.out.println(text);
     }

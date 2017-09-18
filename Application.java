@@ -11,6 +11,7 @@ public class Application {
         OPTION5("5. Show fullname and phone number of an applicant, which email is like @adipiscingenimmi.edu"),
         OPTION6("6. Add Markus Schaffarzyk to DB"),
         OPTION7("7. Edit phone number of applicant Jenima Foreman "),
+        OPTION8("8. Advanced search "),
         OPTION0("0. Exit ");
 
         private final String message;
@@ -34,6 +35,18 @@ public class Application {
             View.print(choice.message());
         }
         View.newLine();
+    }
+
+    public static String getString() {
+        Scanner scan = new Scanner(System.in);
+        View.print("Enter text: ");
+        while(scan.hasNextLine()){
+            String input = scan.nextLine();
+            return input;
+        }
+        scan.close();
+        return null;
+
     }
 
     public static void main(String[] args) {
@@ -60,12 +73,12 @@ public class Application {
                     break;
                 case "4":
                     View.print(Choices.OPTION4.info());
-                    query1 = "SELECT (first_name || ' ' || last_name) AS full_name, phone_number FROM applicants WHERE first_name = 'Carol';";
+                    query1 = View.SEARCHCAROLQUERY;
                     SQL.selectFullnameAndPhone(query1);
                     break;
                 case "5":
                     View.print(Choices.OPTION5.info());
-                    query2 = "SELECT (first_name || ' ' || last_name) AS full_name, phone_number FROM applicants WHERE email LIKE '%@adipiscingenimmi.edu';";
+                    query2 = View.EMAILSEARCHQUERY;
                     SQL.selectFullnameAndPhone(query2);
                     break;
                 case "6":
@@ -75,6 +88,10 @@ public class Application {
                 case "7":
                     View.print(Choices.OPTION7.info());
                     SQL.UpdateAndCheckJemima();
+                    break;
+                case "8":
+                    String order = getString();
+                    SQL.searchForWord(order);
                     break;
                 case "0":
                     System.exit(0);
