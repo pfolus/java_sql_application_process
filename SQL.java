@@ -3,22 +3,28 @@ import java.util.ArrayList;
 
 public class SQL {
 
-    public static void createTables() {
-
-        Connection c = null;
-        Statement stmt = null;
+    public static Connection getDbConnection(String dbPath) {
 
         try {
             Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            View.print("Opened database successfully");
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+            System.out.println("Opened database successfully");
+            connection.setAutoCommit(false);
+            return connection;
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        } return null;
+    }
 
+    public static void createTables() {
+        Statement stmt = null;
+        try (Connection c = getDbConnection("test.db")) {
             stmt = c.createStatement();
-            stmt.executeUpdate(View.TABLE1);
-            stmt.executeUpdate(View.TABLE2);
+            stmt.executeUpdate(View.CREATETABLE1);
+            stmt.executeUpdate(View.CREATETABLE2);
+            c.commit();
             stmt.close();
-
-            c.close();
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -27,17 +33,10 @@ public class SQL {
     }
 
     public static void insertRecordsIntoTables() {
-        Connection c = null;
         Statement stmt = null;
         ArrayList<String> applicants;
         ArrayList<String> mentors;
-
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            c.setAutoCommit(false);
-            View.print("Opened database successfully");
-
+        try (Connection c = getDbConnection("test.db")) {
             stmt = c.createStatement();
             applicants = CSVManager.loadLines("applicants.csv");
             mentors = CSVManager.loadLines("mentors.csv");
@@ -51,10 +50,8 @@ public class SQL {
                 " VALUES (" + mentorInfo + ");";
                 stmt.executeUpdate(sql);
             }
-
             stmt.close();
             c.commit();
-            c.close();
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -63,14 +60,9 @@ public class SQL {
     }
 
     public static void selectMentorsNames() {
-        Connection c = null;
         Statement stmt = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            c.setAutoCommit(false);
-            View.print("Opened database successfully");
 
+        try (Connection c = getDbConnection("test.db")) {
             stmt = c.createStatement();
             ResultSet rs = stmt.executeQuery( "SELECT first_name, last_name FROM mentors;" );
 
@@ -84,7 +76,6 @@ public class SQL {
             }
             rs.close();
             stmt.close();
-            c.close();
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -93,26 +84,18 @@ public class SQL {
     }
 
     public static void selectMentorsNicknames() {
-        Connection c = null;
         Statement stmt = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            c.setAutoCommit(false);
-            View.print("Opened database successfully");
-
+        try (Connection c = getDbConnection("test.db")) {
             stmt = c.createStatement();
             ResultSet rs = stmt.executeQuery( "SELECT nick_name FROM mentors WHERE city = 'Miskolc';");
 
             while ( rs.next() ) {
                 String nickName = rs.getString("nick_name");
-
                 View.printSameLine("nick_name: " + nickName);
                 View.newLine();
             }
             rs.close();
             stmt.close();
-            c.close();
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -121,14 +104,9 @@ public class SQL {
     }
 
     public static void selectFullnameAndPhone(String query) {
-        Connection c = null;
         Statement stmt = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            c.setAutoCommit(false);
-            View.print("Opened database successfully");
 
+        try (Connection c = getDbConnection("test.db")) {
             stmt = c.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while ( rs.next() ) {
@@ -141,7 +119,6 @@ public class SQL {
             }
             rs.close();
             stmt.close();
-            c.close();
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -150,21 +127,14 @@ public class SQL {
     }
 
     public static void AddApplicantAndShowHisDetails() {
-        Connection c = null;
         Statement stmt = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            c.setAutoCommit(false);
-            View.print("Opened database successfully");
-
+        try (Connection c = getDbConnection("test.db")) {
             stmt = c.createStatement();
-
             try {
                 String sql = "INSERT INTO `applicants` (first_name,last_name,phone_number,email,application_code)" +
                 "VALUES ('Markus', 'Schaffarzyk', '003620/725-2666', 'djnovus@groovecoverage.com', 54823);";
-                c.commit();
                 stmt.executeUpdate(sql);
+                c.commit();
             } catch (Exception e) {
                 View.print("User already in base");
             }
@@ -184,11 +154,9 @@ public class SQL {
                 View.print("phone number: " + phoneNumber);
                 View.print("application code: " + applicationCode);
                 View.newLine();
-
             }
             rs.close();
             stmt.close();
-            c.close();
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -197,14 +165,9 @@ public class SQL {
     }
 
     public static void UpdateAndCheckJemima() {
-        Connection c = null;
         Statement stmt = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            c.setAutoCommit(false);
-            View.print("Opened database successfully");
 
+        try (Connection c = getDbConnection("test.db")) {
             stmt = c.createStatement();
             String sql = "UPDATE applicants SET phone_number = '003670/223-7459'" +
             "WHERE first_name = 'Jemima' AND last_name = 'Foreman';";
@@ -224,11 +187,9 @@ public class SQL {
                 View.print("last name: " + lastName);
                 View.print("phone number: " + phoneNumber);
                 View.newLine();
-
             }
             rs.close();
             stmt.close();
-            c.close();
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -237,21 +198,14 @@ public class SQL {
     }
 
     public static void DeleteApplicantsByEmail() {
-        Connection c = null;
         Statement stmt = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            c.setAutoCommit(false);
-            View.print("Opened database successfully");
 
+        try (Connection c = getDbConnection("test.db")) {
             stmt = c.createStatement();
             String sql = "DELETE FROM applicants WHERE email LIKE '%@mauriseu.net';";
             stmt.executeUpdate(sql);
             c.commit();
-
             stmt.close();
-            c.close();
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);
@@ -260,15 +214,9 @@ public class SQL {
     }
 
     public static void searchForWord(String word) {
-        Connection c = null;
         Statement stmt = null;
         Statement stmt2 = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:test.db");
-            c.setAutoCommit(false);
-            View.print("Opened database successfully");
-
+        try (Connection c = getDbConnection("test.db")) {
             stmt = c.createStatement();
             stmt2 = c.createStatement();
             ResultSet rs = stmt.executeQuery(
@@ -322,7 +270,6 @@ public class SQL {
             rs2.close();
             stmt.close();
             stmt2.close();
-            c.close();
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);

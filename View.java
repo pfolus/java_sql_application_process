@@ -1,5 +1,5 @@
 public class View {
-    public static final String TABLE1 =
+    public static final String CREATETABLE1 =
         "CREATE TABLE `mentors` (" +
         "`id` INTEGER NOT NULL UNIQUE," +
         "`first_name`	TEXT," +
@@ -11,7 +11,7 @@ public class View {
         "`favourite_number`	INTEGER," +
         "PRIMARY KEY(`id`))";
 
-    public static final String TABLE2 =
+    public static final String CREATETABLE2 =
         "CREATE TABLE `applicants` (" +
         "`id` INTEGER NOT NULL UNIQUE," +
         "`first_name`	TEXT," +
